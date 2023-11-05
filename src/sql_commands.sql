@@ -1,11 +1,14 @@
+# Создание БД 'course_work_5'
 CREATE DATABASE course_work_5;
 
+# Создание таблицы 'employers'
 CREATE TABLE employers
 (
 	employer_id int PRIMARY KEY,
 	employer_name varchar(100)
 );
 
+# Создание таблицы 'vacancies'
 CREATE TABLE vacancies
 (
 	vacancy_id int PRIMARY KEY,
