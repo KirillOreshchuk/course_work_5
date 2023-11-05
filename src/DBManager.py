@@ -5,7 +5,6 @@ class DBManager:
     """
     Класс для подключения к БД PostgreSQL
     """
-
     conn = psycopg2.connect(host='localhost', database='course_work_5', user='postgres', password='1432')
 
     def get_companies_and_vacancies_count(self):
@@ -18,9 +17,9 @@ class DBManager:
                         GROUP BY employers.employer_name;''')
 
             result = cur.fetchall()
-            self.conn.close()
 
-        return result
+        for res in result:
+            print(res)
 
     def get_all_vacancies(self):
         """
@@ -33,9 +32,9 @@ class DBManager:
             JOIN vacancies USING(employer_id);''')
 
             result = cur.fetchall()
-            self.conn.close()
 
-        return result
+        for res in result:
+            print(res)
 
     def get_avg_salary(self):
         """
@@ -45,9 +44,8 @@ class DBManager:
             cur.execute('SELECT AVG(salary_to) AS avg_salary FROM vacancies;')
 
             result = cur.fetchall()
-            self.conn.close()
 
-        return result
+        print(result)
 
     def get_vacancies_with_higher_salary(self):
         """
@@ -60,9 +58,9 @@ class DBManager:
             ORDER BY salary_to DESC;''')
 
             result = cur.fetchall()
-            self.conn.close()
 
-        return result
+        for res in result:
+            print(res)
 
     def get_vacancies_with_keyword(self, keyword):
         """
@@ -74,6 +72,5 @@ class DBManager:
             result = cur.fetchall()
             if not result:
                 result = "Переданное в метод слово не содержится в вакансии"
-            self.conn.close()
 
-        return result
+        print(result)

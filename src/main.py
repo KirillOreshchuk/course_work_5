@@ -1,56 +1,50 @@
-import psycopg2
-
-from utils_api_hhru import list_employer_id, get_employer_name, get_info_vacancies
 from DBManager import DBManager
+from sql_tables import truncate_tables, fill_table_employers, fill_vacancies_table
 
-conn = psycopg2.connect(host='localhost', database='course_work_5', user='postgres', password='1432')
 
-
-def fill_table_employers():
+def main():
     """
-    Заполняет таблицу employers данными
+    Основная пользовательсквя функция
     """
-    try:
-        with conn:
-            with conn.cursor() as cur:
-                for employer_id in list_employer_id:
-                    cur.execute('INSERT INTO employers Values(%s, %s)', (employer_id, get_employer_name(employer_id)))
+    truncate_tables()
+    fill_table_employers()
+    fill_vacancies_table()
 
-    finally:
-        conn.close()
+    print('База данных работодателей и вакансий созданы')
+    while True:
+        try:
+            user_input = int(input('1 - Получить список всех компаний и количество вакансий у каждой компании;\n'
+                                   '2 - Получить список всех вакансий с указанием названия компании,'
+                                   ' названия вакансии и зарплаты и ссылки на вакансию;\n'
+                                   '3 - Получить среднюю зарплату по вакансиям;\n'
+                                   '4 - Получить список всех вакансий,'
+                                   ' у которых зарплата выше средней по всем вакансиям;\n'
+                                   '5 - Получить список всех вакансий по ключевому слову;\n'
+                                   '0 - Завершить программу.\n'
+                                   'Введите команду: '))
+        except ValueError:
+            print('Вы ввели неправильную команду')
+            continue
+
+        dbmanager = DBManager()
+
+        if user_input == 1:
+            dbmanager.get_companies_and_vacancies_count()
+        elif user_input == 2:
+            dbmanager.get_all_vacancies()
+        elif user_input == 3:
+            dbmanager.get_avg_salary()
+        elif user_input == 4:
+            dbmanager.get_vacancies_with_higher_salary()
+        elif user_input == 5:
+            keyword = input("Введите ключевое слово: ")
+            dbmanager.get_vacancies_with_keyword(keyword)
+        elif user_input == 0:
+            print('Спасибо за использование программы!')
+            break
+        else:
+            print('Вы ввели неправильную команду')
+            continue
 
 
-def fill_vacancies_table():
-    """
-    Заполняет таблицу vacancies данными
-    """
-    try:
-        with conn:
-            with conn.cursor() as cur:
-                count_vacancy = 0
-                for employer_id in list_employer_id:
-                    for vacancy in get_info_vacancies(employer_id)['items']:
-                        cur.execute('INSERT INTO vacancies VALUES(%s, %s, %s, %s, %s, %s)',
-                                    (
-                                                                           count_vacancy + 1,
-                                                                           employer_id,
-                                                                           vacancy['name'],
-                                                                           vacancy['salary']['from'],
-                                                                           vacancy['salary']['to'],
-                                                                           vacancy['alternate_url']
-                                    )
-                                    )
-
-                        count_vacancy += 1
-    finally:
-        conn.close()
-
-
-dbmanager = DBManager()
-
-# print(dbmanager.get_vacancies_with_higher_salary())
-# print(dbmanager.get_companies_and_vacancies_count())
-# print(dbmanager.get_avg_salary())
-# print(dbmanager.get_vacancies_with_higher_salary())
-# print(dbmanager.get_vacancies_with_keyword('Python'))
-
+main()
